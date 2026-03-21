@@ -24,5 +24,5 @@ def add_delivery_view(request):
         
         command.execute(address)
         
-        return redirect("delivery-list")
+        return redirect("delivery_list")
     return render(request, "deliverymanager/add_delivery.html")

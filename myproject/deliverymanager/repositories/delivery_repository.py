@@ -11,11 +11,11 @@ class DeliveryRepository:
         return deleted_count
 
     def get_unassigned_deliveries(self):
-        return Delivery.objects.filter(routes__isnull=True)
+        return Delivery.objects.filter(route__isnull=True)
 
     def get_deliveries_for_route(self, route):
         return Delivery.objects.filter(route=route)
 
     def clear_queue(self):
-        deleted_count, _ = Delivery.objects.filter(routes__isnull=True).delete()
+        deleted_count, _ = Delivery.objects.filter(route__isnull=True).delete()
         return deleted_count
