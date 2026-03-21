@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Manager</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 400px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background-color: #a71d2a;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .inline-form {
+            display: inline;
+        }
+
+        .empty {
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🚚 Delivery Manager</h1>
+
+    <div class="container">
+
+        <!-- Add Delivery -->
+        <div class="panel">
+            <h2>Add Delivery</h2>
+
+            <form method="post" action="{% url 'add_delivery' %}">
+                {% csrf_token %}
+                <input type="text" name="address" placeholder="Enter address" required>
+                <button type="submit">Add Delivery</button>
+            </form>
+        </div>
+
+        <!-- Delivery List -->
+        <div class="panel">
+            <h2>Unassigned Deliveries</h2>
+
+            {% if deliveries %}
+                <ul>
+                    {% for delivery in deliveries %}
+                        <li>
+                            <span>{{ delivery.address }}</span>
+
+                            <form method="post"
+                                  action="{% url 'remove_delivery' delivery.id %}"
+                                  class="inline-form">
+                                {% csrf_token %}
+                                <button class="delete-btn">Delete</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty">No deliveries yet.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>

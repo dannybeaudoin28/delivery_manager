@@ -9,6 +9,14 @@ from deliverymanager.services.geocoding_service import GeocodingService
 delivery_repository = DeliveryRepository()
 geocoding_service = GeocodingService()
 
+def dashboard_view(request):
+    delivery_repository = DeliveryRepository()
+    deliveries = delivery_repository.get_unassigned_deliveries()
+
+    return render(request, "deliverymanager/dashboard.html", {
+        "deliveries": deliveries
+    })
+
 def delivery_list_view(request):
     deliveries = delivery_repository.get_unassigned_deliveries()
     
@@ -19,19 +27,18 @@ def delivery_list_view(request):
 def add_delivery_view(request):
     if request.method == "POST":
         address = request.POST.get("address")
-        
-        
+
+        delivery_repository = DeliveryRepository()
+        geocoding_service = GeocodingService()
         command = AddDeliveryCommand(delivery_repository, geocoding_service)
-        
         command.execute(address)
-        
-        return redirect("delivery_list")
-    return render(request, "deliverymanager/add_delivery.html")
+
+    return redirect("dashboard")
 
 def remove_delivery_view(request, delivery_id):
     if request.method == "POST":
         delivery = get_object_or_404(Delivery, id=delivery_id)
         delivery_repository = DeliveryRepository()
         delivery_repository.remove_delivery(delivery)
-    
-    return redirect('delivery_list')
+
+    return redirect("dashboard")
