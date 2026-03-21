@@ -9,6 +9,10 @@ class Delivery(models.Model):
     def get_created_at(self):
         return self.created_at
     
+class CustomDelivery(Delivery):
+    priority_level = models.IntegerField()
+    scheduled_time = models.DateTimeField()
+    
 class Route(models.Model):
     deliveries = models.ManyToManyField(Delivery)
     total_time = models.FloatField()
