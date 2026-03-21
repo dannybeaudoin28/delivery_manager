@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Delivery</title>
+</head>
+<body>
+    <h1>Add Delivery</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="address">Address:</label>
+        <input type="text" name="address" id="address" required>
+        <button type="submit">Add Delivery</button>
+    </form>
+
+    <a href="{% url 'delivery_list' %}">View Queue</a>
+</body>
+</html>

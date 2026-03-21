@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Queue</title>
+</head>
+<body>
+    <h1>Unassigned Deliveries</h1>
+
+    {% if deliveries %}
+        <ul>
+            {% for delivery in deliveries %}
+                <li>
+                    {{ delivery.address }} ({{ delivery.latitude }}, {{ delivery.longitude }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No unassigned deliveries.</p>
+    {% endif %}
+
+    <a href="{% url 'add_delivery' %}">Add another delivery</a>
+</body>
+</html>
