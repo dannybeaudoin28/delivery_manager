@@ -1,12 +1,20 @@
 from django.db import models
 
 class Delivery(models.Model):
-    id = models.AutoField(primary_key=True)
     address = models.CharField(max_length=200)
-    latitude = models.FloatField(default=000000.00)
-    longitude = models.FloatField(default=000000.00)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     createdAt = models.DateTimeField(auto_now_add=True)
-    updatedAt = models.DateTimeField(auto_now=True) 
     
     def get_created_at(self):
         return self.created_at
+    
+class Route(models.Model):
+    deliveries = models.ManyToManyField(Delivery)
+    total_time = models.FloatField()
+    total_distance = models.FloatField()
+    
+class Driver(models.Model):
+    name = models.CharField(max_length=30)
+    route = models.OneToOneField(Route, on_delete=models.SET_NULL, null=True)
+    
