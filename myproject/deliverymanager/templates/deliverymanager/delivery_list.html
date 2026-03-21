@@ -10,7 +10,12 @@
         <ul>
             {% for delivery in deliveries %}
                 <li>
-                    {{ delivery.address }} ({{ delivery.latitude }}, {{ delivery.longitude }})
+                    {{ delivery.address }}
+                    
+                    <form method="post" action="{% url 'remove_delivery' delivery.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Delete</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>

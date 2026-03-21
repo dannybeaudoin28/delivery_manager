@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from deliverymanager.models import Delivery
 from django.http import HttpResponse
 
 from deliverymanager.commands.add_delivery_command import AddDeliveryCommand
@@ -26,3 +27,11 @@ def add_delivery_view(request):
         
         return redirect("delivery_list")
     return render(request, "deliverymanager/add_delivery.html")
+
+def remove_delivery_view(request, delivery_id):
+    if request.method == "POST":
+        delivery = get_object_or_404(Delivery, id=delivery_id)
+        delivery_repository = DeliveryRepository()
+        delivery_repository.remove_delivery(delivery)
+    
+    return redirect('delivery_list')
