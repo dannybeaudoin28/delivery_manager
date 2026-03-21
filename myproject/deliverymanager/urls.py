@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.dashboard_view, name='dashboard'),
     path('add-delivery/', views.add_delivery_view, name='add_delivery'),
     path('deliveries/delete/<int:delivery_id>/', views.remove_delivery_view, name='remove_delivery'),
+    path('deliveries/clear-queue', view=views.clear_queue_view, name='clear_queue')
 ]

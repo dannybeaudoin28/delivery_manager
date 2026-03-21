@@ -12,6 +12,9 @@ class DeliveryRepository:
 
     def get_unassigned_deliveries(self):
         return Delivery.objects.filter(route__isnull=True)
+    
+    def get_all_deliveries(self):
+        return Delivery.objects.all().order_by('-created_at')
 
     def get_deliveries_for_route(self, route):
         return Delivery.objects.filter(route=route)

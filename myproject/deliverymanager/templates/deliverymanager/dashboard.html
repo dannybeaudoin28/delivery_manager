@@ -9,6 +9,11 @@
             background-color: #f4f6f8;
             margin: 0;
             padding: 40px;
+            box-sizing: border-box;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         h1 {
@@ -16,22 +21,54 @@
             margin-bottom: 30px;
         }
 
-        .container {
+        .page-container {
             display: flex;
+            flex-direction: column;
             gap: 30px;
-            justify-content: center;
+            width: 100%;
         }
 
-        .panel {
+        .top-row {
+            display: flex;
+            gap: 30px;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .panel,
+        .route-panel,
+        .full-width-panel {
             background: white;
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            width: 400px;
+        }
+
+        .panel {
+            flex: 0 0 320px;
+            min-width: 320px;
+        }
+
+        .route-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .full-width-panel {
+            width: 100%;
         }
 
         h2 {
             margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         input[type="text"] {
@@ -66,9 +103,18 @@
             background-color: #a71d2a;
         }
 
+        .clear-btn {
+            background-color: #6c757d;
+        }
+
+        .clear-btn:hover {
+            background-color: #545b62;
+        }
+
         ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         li {
@@ -79,14 +125,49 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
         }
 
         .inline-form {
             display: inline;
+            margin: 0;
         }
 
         .empty {
             color: #777;
+        }
+
+        .placeholder-box {
+            min-height: 260px;
+            border: 2px dashed #d0d7de;
+            border-radius: 8px;
+            background: #fafbfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background-color: #f8f9fa;
         }
     </style>
 </head>
@@ -94,41 +175,119 @@
 <body>
     <h1>🚚 Delivery Manager</h1>
 
-    <div class="container">
+    <div class="page-container">
 
-        <!-- Add Delivery -->
-        <div class="panel">
-            <h2>Add Delivery</h2>
+        <div class="top-row">
 
-            <form method="post" action="{% url 'add_delivery' %}">
-                {% csrf_token %}
-                <input type="text" name="address" placeholder="Enter address" required>
-                <button type="submit">Add Delivery</button>
-            </form>
+            <div class="panel">
+                <h2>Add Delivery</h2>
+
+                <form method="post" action="{% url 'add_delivery' %}">
+                    {% csrf_token %}
+                    <input
+                        type="text"
+                        name="address"
+                        placeholder="Address Format: Street# Street unit#, City, Prov, Postal, Country"
+                        required
+                    >
+                    <button type="submit">Add Delivery</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <div class="section-header">
+                    <h2>Unassigned Deliveries</h2>
+
+                    {% if deliveries %}
+                        <form method="post" action="{% url 'clear_queue' %}" class="inline-form">
+                            {% csrf_token %}
+                            <button
+                                type="submit"
+                                class="clear-btn"
+                                onclick="return confirm('Delete all unassigned deliveries?')"
+                            >
+                                Clear Queue
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+
+                {% if deliveries %}
+                    <ul>
+                        {% for delivery in deliveries %}
+                            <li>
+                                <span>{{ delivery.address }}</span>
+
+                                <form method="post"
+                                      action="{% url 'remove_delivery' delivery.id %}"
+                                      class="inline-form">
+                                    {% csrf_token %}
+                                    <button
+                                        type="submit"
+                                        class="delete-btn"
+                                        onclick="return confirm('Delete this delivery?')"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty">No deliveries yet.</p>
+                {% endif %}
+            </div>
+
+            <div class="route-panel">
+                <h2>Route Generation</h2>
+                <div class="placeholder-box">
+                    This is where the route generation section will go.
+                </div>
+            </div>
+
         </div>
 
-        <!-- Delivery List -->
-        <div class="panel">
-            <h2>Unassigned Deliveries</h2>
+        <div class="full-width-panel">
+            <h2>All Deliveries</h2>
 
-            {% if deliveries %}
-                <ul>
-                    {% for delivery in deliveries %}
-                        <li>
-                            <span>{{ delivery.address }}</span>
-
-                            <form method="post"
-                                  action="{% url 'remove_delivery' delivery.id %}"
-                                  class="inline-form">
-                                {% csrf_token %}
-                                <button class="delete-btn">Delete</button>
-                            </form>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="empty">No deliveries yet.</p>
-            {% endif %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Address</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                            <th>Created At</th>
+                            <th>Route</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if all_deliveries %}
+                            {% for delivery in all_deliveries %}
+                                <tr>
+                                    <td>{{ delivery.id }}</td>
+                                    <td>{{ delivery.address }}</td>
+                                    <td>{{ delivery.latitude }}</td>
+                                    <td>{{ delivery.longitude }}</td>
+                                    <td>{{ delivery.created_at }}</td>
+                                    <td>
+                                        {% if delivery.route %}
+                                            Route {{ delivery.route.id }}
+                                        {% else %}
+                                            Unassigned
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="empty">No deliveries found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
