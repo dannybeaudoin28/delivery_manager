@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'deliverymanager.apps.DeliverymanagerConfig',
+    'deliverymanager',
 ]
 
 MIDDLEWARE = [
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "apps.deliverymanager.wsgi.application"
+WSGI_APPLICATION = "myproject.wsgi.application"
 
 
 # Database
