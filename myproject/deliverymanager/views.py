@@ -3,19 +3,66 @@ from deliverymanager.models import Delivery
 from django.http import HttpResponse
 
 from deliverymanager.commands.add_delivery_command import AddDeliveryCommand
+from deliverymanager.commands.generate_route_command import GenerateRouteCommand
+from deliverymanager.commands.mark_delivery_delivered_command import MarkDeliveryDeliveredCommand
+
 from deliverymanager.repositories.delivery_repository import DeliveryRepository
 from deliverymanager.services.geocoding_service import GeocodingService
+from deliverymanager.services.routing_service import RoutingService
+
+from deliverymanager.models import Route
+from deliverymanager.models import Driver
+
 
 delivery_repository = DeliveryRepository()
 geocoding_service = GeocodingService()
+routing_service = RoutingService()
 
 def dashboard_view(request):
+    remaining_time = 0 
+    distance = 0
     deliveries = delivery_repository.get_unassigned_deliveries()
     all_deliveries = delivery_repository.get_all_deliveries()
+    
+    for driver in Driver.objects.exclude(route__isnull=True):
+        route = driver.route
+        if route is None:
+            continue
+
+        active_deliveries = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
+
+        if active_deliveries == 0:
+            driver.route = None
+            driver.save()
+
+    drivers = Driver.objects.filter(route__isnull=True).order_by("name")    
+    latest_route = Route.objects.order_by('-id').first()
+    latest_route_deliveries = []
+
+    if latest_route:
+        latest_route_deliveries = latest_route.deliveries.all().order_by('route_order')
+        minutes, seconds = divmod(latest_route.total_time, 60)
+        kilometers, meters = divmod(latest_route.total_distance, 1000)
+        
+        remaining_time = {
+            "quotient": minutes,
+            "remainder": seconds
+        }
+        
+        distance = {
+            "quotient": kilometers,
+            "remainder": meters
+        }
+    
 
     return render(request, "deliverymanager/dashboard.html", {
         "deliveries": deliveries,
-        "all_deliveries": all_deliveries
+        "all_deliveries": all_deliveries,
+        "latest_route": latest_route,
+        "drivers": drivers,
+        "latest_route_deliveries": latest_route_deliveries,
+        "remaining_time": remaining_time,
+        "distance": distance,
     })
 
 def delivery_list_view(request):
@@ -46,3 +93,30 @@ def clear_queue_view(request):
     if request.method == "POST":
         delivery_repository.clear_queue()
     return redirect('dashboard')
+
+def generate_route_view(request):
+    if request.method == "POST":
+        try:
+            driver_id = request.POST.get("driver_id")
+
+            if not driver_id:
+                return HttpResponse("Please select a driver.", status=400)
+
+            routing_service = RoutingService()
+            command = GenerateRouteCommand(delivery_repository, routing_service)
+
+            origin = (44.2312, -76.4860)
+            command.execute(origin, driver_id)
+
+        except Exception as e:
+            return HttpResponse(f"Route generation failed: {e}", status=500)
+
+    return redirect("dashboard")
+
+def mark_delivered(request, delivery_id):
+    print("ID IS: " + str(delivery_id))
+    if request.method == "POST":
+        command = MarkDeliveryDeliveredCommand(delivery_repository)
+        command.execute(delivery_id)
+
+    return redirect("dashboard")

@@ -9,16 +9,38 @@ class Driver(models.Model):
     route = models.OneToOneField(Route, on_delete=models.SET_NULL, null=True)
     
 class Delivery(models.Model):
+    STATUS_UNASSIGNED = "Unassigned"
+    STATUS_ASSIGNED = "Assigned"
+    STATUS_DELIVERED = "Delivered"
+
+    STATUS_CHOICES = [
+        (STATUS_UNASSIGNED, "Unassigned"),
+        (STATUS_ASSIGNED, "Assigned"),
+        (STATUS_DELIVERED, "Delivered"),
+    ]
+    
     address = models.CharField(max_length=200)
     latitude = models.FloatField()
     longitude = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
+    
     route = models.ForeignKey(
         Route, 
         on_delete=models.SET_NULL, 
         null=True, 
+        blank=True,
         related_name='deliveries'
     )
+    
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_UNASSIGNED
+    )
+
+    route_order = models.IntegerField(null=True, blank=True)
+    leg_distance_meters = models.FloatField(null=True, blank=True)
+    leg_duration_seconds = models.IntegerField(null=True, blank=True)
     
     def get_created_at(self):
         return self.created_at
