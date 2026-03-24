@@ -120,3 +120,13 @@ def mark_delivered(request, delivery_id):
         command.execute(delivery_id)
 
     return redirect("dashboard")
+
+def edit_delivery(request, delivery_id):
+    delivery = get_object_or_404(Delivery, id=delivery_id)
+
+    if request.method == "POST":
+        delivery.address = request.POST.get("address", "").strip()
+        delivery.save()
+        return redirect('dashboard')  
+
+    return render(request, 'deliverymanager/edit_delivery.html', {'delivery': delivery})

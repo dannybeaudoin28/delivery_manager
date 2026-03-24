@@ -192,7 +192,7 @@
             margin-top: 20px;
             margin-bottom: 12px;
         }
-        
+
         .route-generate-form {
             display: flex;
             align-items: center;
@@ -218,6 +218,47 @@
         .delivered-btn:hover {
             background-color: #1e7e34;
         }
+
+        .queue-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .delivery-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            background-color: #007bff;
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            margin-left: 0;
+        }
+
+        .edit-btn {
+            display: inline-block;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 
@@ -235,23 +276,14 @@
                     {% csrf_token %}
                     <input type="text" name="address"
                         placeholder="Address Format: Street# Street unit#, City, Prov, Postal, Country" required>
-                    <button type="submit">Add Delivery</button>
+                    <button type="submit">Add To Queue</button>
                 </form>
             </div>
+
 
             <div class="panel">
                 <div class="section-header">
                     <h2>Delivery Queue</h2>
-
-                    {% if deliveries %}
-                    <form method="post" action="{% url 'clear_queue' %}" class="inline-form">
-                        {% csrf_token %}
-                        <button type="submit" class="clear-btn"
-                            onclick="return confirm('Delete all unassigned deliveries?')">
-                            Clear Queue
-                        </button>
-                    </form>
-                    {% endif %}
                 </div>
 
                 {% if deliveries %}
@@ -260,39 +292,49 @@
                     <li>
                         <span>{{ delivery.address }}</span>
 
-                        <form method="post" action="{% url 'remove_delivery' delivery.id %}" class="inline-form">
-                            {% csrf_token %}
-                            <button type="submit" class="delete-btn" onclick="return confirm('Delete this delivery?')">
-                                Delete
-                            </button>
-                        </form>
+                        <div class="delivery-actions">
+                            <a href="{% url 'edit_delivery' delivery.id %}" class="edit-btn">Edit</a>
+
+                            <form method="post" action="{% url 'remove_delivery' delivery.id %}" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn"
+                                    onclick="return confirm('Delete this delivery?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </li>
                     {% endfor %}
                 </ul>
+
+                <div class="queue-footer">
+                    <form method="post" action="{% url 'clear_queue' %}" class="inline-form">
+                        {% csrf_token %}
+                        <button type="submit" class="clear-btn"
+                            onclick="return confirm('Delete all unassigned deliveries?')">
+                            Clear Queue
+                        </button>
+                    </form>
+                </div>
                 {% else %}
                 <p class="empty">No deliveries yet.</p>
                 {% endif %}
             </div>
-
             <div class="route-panel">
                 <div class="section-header">
                     <h2>Route Generation</h2>
-
                     <form method="post" action="{% url 'generate_route' %}" class="route-generate-form">
                         {% csrf_token %}
 
                         <select name="driver_id" class="driver-select" required>
                             <option value="">Select Driver</option>
                             {% for driver in drivers %}
-                                <option value="{{ driver.id }}">{{ driver.name }}</option>
+                            <option value="{{ driver.id }}">{{ driver.name }}</option>
                             {% endfor %}
                         </select>
 
-                        <button
-                            type="submit"
-                            class="generate-btn"
-                            onclick="return confirm('Generate route from current unassigned deliveries?')"
-                        >
+                        <button type="submit" class="generate-btn"
+                            onclick="return confirm('Generate route from current unassigned deliveries?')">
                             Generate Route
                         </button>
                     </form>
@@ -305,45 +347,46 @@
                     <p>
                         <strong>Driver:</strong>
                         {% if latest_route.driver %}
-                            {{ latest_route.driver.name }}
+                        {{ latest_route.driver.name }}
                         {% else %}
-                            No driver assigned
+                        No driver assigned
                         {% endif %}
                     </p>
-                    <p><strong>Total Distance:</strong> {{ latest_route.total_distance|meters_to_kilometer_meter }} Kilometers.</p>
+                    <p><strong>Total Distance:</strong> {{ latest_route.total_distance|meters_to_kilometer_meter }}
+                        Kilometers.</p>
                     <p><strong>Total Time:</strong> {{ latest_route.total_time|seconds_to_min_sec }}</p>
                     <h3>Ordered Stops</h3>
 
                     {% if latest_route_deliveries %}
                     <ul>
                         {% for delivery in latest_route_deliveries %}
-                            <li>
-                                <div>
-                                    <strong>{{ forloop.counter }}.</strong> {{ delivery.address }}<br>
+                        <li>
+                            <div>
+                                <strong>{{ forloop.counter }}.</strong> {{ delivery.address }}<br>
 
-                                    {% if delivery.leg_duration_seconds %}
-                                        <small>
-                                            {% if forloop.first %}
-                                                Time from home:
-                                            {% else %}
-                                                Time from previous stop:
-                                            {% endif %}
-                                            {{ delivery.leg_duration_seconds|seconds_to_min_sec }}
-                                        </small><br>
+                                {% if delivery.leg_duration_seconds %}
+                                <small>
+                                    {% if forloop.first %}
+                                    Time from home:
+                                    {% else %}
+                                    Time from previous stop:
                                     {% endif %}
+                                    {{ delivery.leg_duration_seconds|seconds_to_min_sec }}
+                                </small><br>
+                                {% endif %}
 
-                                    {% if delivery.leg_distance_meters %}
-                                        <small>
-                                            {% if forloop.first %}
-                                                Distance from home:
-                                            {% else %}
-                                                Distance from previous stop:
-                                            {% endif %}
-                                            {{ delivery.leg_distance_meters|meters_to_kilometer_meter }}
-                                        </small>
+                                {% if delivery.leg_distance_meters %}
+                                <small>
+                                    {% if forloop.first %}
+                                    Distance from home:
+                                    {% else %}
+                                    Distance from previous stop:
                                     {% endif %}
-                                </div>
-                            </li>
+                                    {{ delivery.leg_distance_meters|meters_to_kilometer_meter }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </li>
                         {% endfor %}
                     </ul>
                     {% else %}
@@ -356,12 +399,9 @@
                 </div>
                 {% endif %}
             </div>
-
         </div>
-
         <div class="full-width-panel">
             <h2>All Deliveries</h2>
-
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -395,43 +435,37 @@
                             </td>
                             <td>
                                 {% if delivery.route and delivery.route.driver %}
-                                    {{ delivery.route.driver.name }}
+                                {{ delivery.route.driver.name }}
                                 {% else %}
-                                    Unassigned
+                                Unassigned
                                 {% endif %}
                             </td>
                             <td>{{ delivery.status }}</td>
                             <td>
                                 {% if delivery.status == 'Delivered' %}
-                                    <span class="empty">Completed</span>
+                                <span class="empty">Completed</span>
                                 {% else %}
-                                    <form method="post"
-                                        action="{% url 'mark_delivery_delivered' delivery.id %}"
-                                        class="inline-form">
-                                        {% csrf_token %}
-                                        <button
-                                            type="submit"
-                                            class="delivered-btn"
-                                            onclick="return confirm('Mark this delivery as delivered?')"
-                                        >
-                                            Mark Delivered
-                                        </button>
-                                    </form>
+                                <form method="post" action="{% url 'mark_delivery_delivered' delivery.id %}"
+                                    class="inline-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delivered-btn"
+                                        onclick="return confirm('Mark this delivery as delivered?')">
+                                        Mark Delivered
+                                    </button>
+                                </form>
                                 {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="6" class="empty">No deliveries found.</td>
+                            <td colspan="9" class="empty">No deliveries found.</td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
-
-    </div>
 </body>
 
 </html>
