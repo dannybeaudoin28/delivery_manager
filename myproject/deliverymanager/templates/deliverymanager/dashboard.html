@@ -274,8 +274,14 @@
 
                 <form method="post" action="{% url 'add_delivery' %}">
                     {% csrf_token %}
-                    <input type="text" name="address"
-                        placeholder="Address Format: Street# Street unit#, City, Prov, Postal, Country" required>
+
+                    <input type="text" name="address" required>
+
+                    <label>
+                        <input type="checkbox" name="delivery_type" value="custom">
+                        Custom Delivery
+                    </label>
+
                     <button type="submit">Add To Queue</button>
                 </form>
             </div>

@@ -1,16 +1,20 @@
 from .delivery_command import DeliveryCommand
-from deliverymanager.models import Delivery
-
 
 class AddDeliveryCommand(DeliveryCommand):
+    def __init__(self, geocoding_service, delivery_repository, delivery_factory):
+        self.geocoding_service = geocoding_service
+        self.delivery_repository = delivery_repository
+        self.delivery_factory = delivery_factory
 
-    def execute(self, address):
+    def execute(self, kwargs):
+        address, delivery_type = kwargs
         latitude, longitude = self.geocoding_service.get_coordinates(address)
 
-        delivery = Delivery(
+        delivery = self.delivery_factory.create_delivery(
+            delivery_type=delivery_type,
             address=address,
             latitude=latitude,
-            longitude=longitude
+            longitude=longitude,
         )
 
         return self.delivery_repository.add_or_update_delivery(delivery)

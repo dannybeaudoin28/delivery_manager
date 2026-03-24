@@ -13,10 +13,13 @@ from deliverymanager.services.routing_service import RoutingService
 from deliverymanager.models import Route
 from deliverymanager.models import Driver
 
+from deliverymanager.factories.delivery_factory import DeliveryFactory
+
 
 delivery_repository = DeliveryRepository()
 geocoding_service = GeocodingService()
 routing_service = RoutingService()
+delivery_factory = DeliveryFactory()
 
 def dashboard_view(request):
     remaining_time = 0 
@@ -75,9 +78,11 @@ def delivery_list_view(request):
 def add_delivery_view(request):
     if request.method == "POST":
         address = request.POST.get("address")
+        delivery_type = request.POST.get("delivery_type")
+        params = (address, delivery_type)
 
-        command = AddDeliveryCommand(delivery_repository, geocoding_service)
-        command.execute(address)
+        command = AddDeliveryCommand(geocoding_service, delivery_repository, delivery_factory)
+        command.execute(params)
 
     return redirect("dashboard")
 
