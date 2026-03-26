@@ -43,22 +43,59 @@ def dashboard_view(request):
     drivers = Driver.objects.filter(route__isnull=True).order_by("name")    
     latest_route = Route.objects.order_by('-id').first()
     latest_route_deliveries = []
+    latest_route_stops = []
 
     if latest_route:
         latest_route_deliveries = latest_route.deliveries.all().order_by('route_order')
+
         minutes, seconds = divmod(latest_route.total_time, 60)
         kilometers, meters = divmod(latest_route.total_distance, 1000)
-        
+
         remaining_time = {
             "quotient": minutes,
             "remainder": seconds
         }
-        
+
         distance = {
             "quotient": kilometers,
             "remainder": meters
         }
-    
+
+        total_delivery_distance = 0
+        total_delivery_duration = 0
+
+        for delivery in latest_route_deliveries:
+            leg_distance = delivery.leg_distance_meters or 0
+            leg_duration = delivery.leg_duration_seconds or 0
+
+            total_delivery_distance += leg_distance
+            total_delivery_duration += leg_duration
+
+            latest_route_stops.append({
+                "is_return": False,
+                "delivery": delivery,
+                "distance_meters": leg_distance,
+                "duration_seconds": leg_duration,
+            })
+
+        return_distance = latest_route.total_distance - total_delivery_distance
+        return_duration = latest_route.total_time - total_delivery_duration
+
+        if return_distance > 0 or return_duration > 0:
+            latest_route_stops.append({
+                "is_return": True,
+                "delivery": None,
+                "distance_meters": return_distance,
+                "duration_seconds": return_duration,
+            })
+            
+        print("ROUTE TOTAL DISTANCE:", latest_route.total_distance)
+        print("SUM DELIVERY DISTANCE:", total_delivery_distance)
+        print("RETURN DISTANCE:", return_distance)
+
+        print("ROUTE TOTAL TIME:", latest_route.total_time)
+        print("SUM DELIVERY TIME:", total_delivery_duration)
+        print("RETURN TIME:", return_duration)
 
     return render(request, "deliverymanager/dashboard.html", {
         "deliveries": deliveries,
@@ -68,6 +105,7 @@ def dashboard_view(request):
         "latest_route_deliveries": latest_route_deliveries,
         "remaining_time": remaining_time,
         "distance": distance,
+        "latest_route_stops": latest_route_stops,
     })
 
 def delivery_list_view(request):

@@ -175,6 +175,16 @@
 
         .generate-btn {
             background-color: #28a745;
+            transition: background-color 0.2s ease;
+        }
+
+        .generate-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .generate-btn:disabled:hover {
+            background-color: #ccc;
         }
 
         .generate-btn:hover {
@@ -392,7 +402,7 @@
                             {% endfor %}
                         </select>
 
-                        <button type="submit" class="generate-btn"
+                        <button type="submit" class="generate-btn" id="generateBtn"
                             onclick="return confirm('Generate route from current unassigned deliveries?')">
                             Generate Route
                         </button>
@@ -400,7 +410,7 @@
                 </div>
                 {% load distance_filters %}
                 {% load time_filters %}
-                {% if latest_route %}
+                {% if latest_route_stops %}
                 <div class="route-results">
                     <p><strong>Latest Route ID:</strong> {{ latest_route.id }}</p>
                     <p>
@@ -416,32 +426,40 @@
                     <p><strong>Total Time:</strong> {{ latest_route.total_time|seconds_to_min_sec }}</p>
                     <h3>Ordered Stops</h3>
 
-                    {% if latest_route_deliveries %}
+                    {% if latest_route_stops %}
                     <ul>
-                        {% for delivery in latest_route_deliveries %}
+                        {% for stop in latest_route_stops %}
                         <li>
                             <div>
-                                <strong>{{ forloop.counter }}.</strong> {{ delivery.address }}<br>
+                                {% if stop.is_return %}
+                                <strong>{{ forloop.counter }}.</strong> Return to Store<br>
+                                {% else %}
+                                <strong>{{ forloop.counter }}.</strong> {{ stop.delivery.address }}<br>
+                                {% endif %}
 
-                                {% if delivery.leg_duration_seconds %}
+                                {% if stop.duration_seconds %}
                                 <small>
                                     {% if forloop.first %}
                                     Time from home:
+                                    {% elif stop.is_return %}
+                                    Time back to store:
                                     {% else %}
                                     Time from previous stop:
                                     {% endif %}
-                                    {{ delivery.leg_duration_seconds|seconds_to_min_sec }}
+                                    {{ stop.duration_seconds|seconds_to_min_sec }}
                                 </small><br>
                                 {% endif %}
 
-                                {% if delivery.leg_distance_meters %}
+                                {% if stop.distance_meters %}
                                 <small>
                                     {% if forloop.first %}
                                     Distance from home:
+                                    {% elif stop.is_return %}
+                                    Distance back to store:
                                     {% else %}
                                     Distance from previous stop:
                                     {% endif %}
-                                    {{ delivery.leg_distance_meters|meters_to_kilometer_meter }}
+                                    {{ stop.distance_meters|meters_to_kilometer_meter }}
                                 </small>
                                 {% endif %}
                             </div>
@@ -529,10 +547,19 @@
 <script>
     const customCheckbox = document.getElementById("customDeliveryCheckbox");
     const customFields = document.getElementById("customDeliveryFields");
+    const driverSelect = document.querySelector('select[name="driver_id"]');
+    const generateBtn = document.getElementById("generateBtn");
 
     function toggleCustomFields() {
         customFields.style.display = customCheckbox.checked ? "block" : "none";
     }
+
+    function toggleGenerateButton() {
+        generateBtn.disabled = !driverSelect.value;
+    }
+
+    driverSelect.addEventListener("change", toggleGenerateButton);
+    toggleGenerateButton();
 
     customCheckbox.addEventListener("change", toggleCustomFields);
     toggleCustomFields();

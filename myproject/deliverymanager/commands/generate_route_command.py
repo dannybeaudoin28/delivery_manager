@@ -37,6 +37,11 @@ class GenerateRouteCommand(DeliveryCommand):
             raise ValueError(f"Driver '{driver.name}' already has an assigned route.")
 
         ordered_route_data = self.routing_service.get_ordered_route(origin, eligible_deliveries)
+        
+        print("ORDERED ROUTE DATA:")
+        for stop in ordered_route_data:
+            print(stop)
+        
         totals = self.routing_service.calculate_totals(ordered_route_data)
 
         route = Route.objects.create(
@@ -47,11 +52,16 @@ class GenerateRouteCommand(DeliveryCommand):
         driver.route = route
         driver.save()
 
-        for index, stop in enumerate(ordered_route_data, start=1):
+        route_order = 1
+
+        for stop in ordered_route_data:
+            if stop.get("is_return"):
+                continue
+
             delivery = stop["delivery"]
             delivery.route = route
             delivery.status = Delivery.STATUS_ASSIGNED
-            delivery.route_order = index
+            delivery.route_order = route_order
             delivery.leg_distance_meters = stop["distance_meters"]
 
             duration_str = stop.get("duration")
@@ -65,6 +75,8 @@ class GenerateRouteCommand(DeliveryCommand):
 
             delivery.leg_duration_seconds = duration_seconds
             delivery.save()
+
+            route_order += 1
 
         return {
             "route": route,

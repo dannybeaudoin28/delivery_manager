@@ -127,6 +127,52 @@ class RoutingService:
             current_location = (next_stop.latitude, next_stop.longitude)
             remaining_stops.pop(best_index)
 
+            if ordered_route:
+                last_stop = ordered_route[-1]["delivery"]
+                last_location = (last_stop.latitude, last_stop.longitude)
+
+                class RoutePoint:
+                    def __init__(self, latitude, longitude):
+                        self.latitude = latitude
+                        self.longitude = longitude
+
+                home_stop = RoutePoint(origin[0], origin[1])
+
+                return_matrix = self.get_multiple_routes(last_location, [home_stop])
+
+                print("LAST LOCATION:", last_location)
+                print("HOME:", (home_stop.latitude, home_stop.longitude))
+                print("RETURN MATRIX:", return_matrix)
+
+                for elem in return_matrix:
+                    if not isinstance(elem, dict):
+                        continue
+
+                    print("RETURN ELEM:", elem)
+
+                    if elem.get("condition") != "ROUTE_EXISTS":
+                        continue
+
+                    dist = elem.get("distanceMeters")
+                    if dist is None:
+                        continue
+
+                    try:
+                        distance_m = int(dist)
+                        duration = elem.get("duration")
+
+                        ordered_route.append({
+                            "delivery": None,
+                            "distance_meters": distance_m,
+                            "duration": duration,
+                            "is_return": True
+                        })
+
+                        print("RETURN STOP APPENDED")
+                        break
+                    except (ValueError, TypeError):
+                        continue
+        
         return ordered_route
 
     def calculate_totals(self, ordered_route):
