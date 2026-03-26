@@ -1,0 +1,300 @@
+body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .top-row {
+            display: flex;
+            gap: 30px;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .panel,
+        .route-panel,
+        .full-width-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .panel {
+            flex: 0 0 320px;
+            min-width: 320px;
+        }
+
+        .route-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .full-width-panel {
+            width: 100%;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+
+        button:hover {
+            background-color: #1e7e34;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background-color: #a71d2a;
+        }
+
+        .clear-btn {
+            background-color: #6c757d;
+        }
+
+        .clear-btn:hover {
+            background-color: #545b62;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .inline-form {
+            display: inline;
+            margin: 0;
+        }
+
+        .empty {
+            color: #777;
+        }
+
+        .placeholder-box {
+            min-height: 260px;
+            border: 2px dashed #d0d7de;
+            border-radius: 8px;
+            background: #fafbfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .generate-btn {
+            background-color: #28a745;
+            transition: background-color 0.2s ease;
+        }
+
+        .generate-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .generate-btn:disabled:hover {
+            background-color: #ccc;
+        }
+
+        .generate-btn:hover {
+            background-color: #1e7e34;
+        }
+
+        .route-results {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            min-height: 260px;
+        }
+
+        .route-results h3 {
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        .route-generate-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 0;
+        }
+
+        .driver-select {
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: white;
+            min-width: 180px;
+            height: 40px;
+        }
+
+        .delivered-btn {
+            background-color: #28a745;
+        }
+
+        .delivered-btn:hover {
+            background-color: #1e7e34;
+        }
+
+        .queue-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .delivery-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            background-color: #007bff;
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            margin-left: 0;
+        }
+
+        .edit-btn {
+            display: inline-block;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="datetime-local"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .priority-1 {
+            border-left: 5px solid red;
+        }
+
+        .priority-2 {
+            border-left: 5px solid orange;
+        }
+
+        .priority-3 {
+            border-left: 5px solid green;
+        }
+
+        .custom-delivery {
+            background-color: #fff8e1;
+            border-left: 5px solid #ffc107;
+        }
+
+        .custom-badge {
+            background-color: #ffc107;
+            color: black;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }

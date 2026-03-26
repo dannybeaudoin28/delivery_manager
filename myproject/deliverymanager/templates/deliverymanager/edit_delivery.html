@@ -1,20 +1,38 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Edit Delivery</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard/style.css' %}">
 </head>
 
 <body>
-    <h1>Edit Delivery</h1>
+    <h1>🚚 Delivery Manager</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        <input type="text" name="address" value="{{ delivery.address }}" required>
-        <button type="submit">Save</button>
-    </form>
+    <div class="page-container">
 
-    <a href="{% url 'dashboard' %}">Cancel</a>
+        <div class="panel">
+            <h2>Edit Delivery</h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <input type="text" name="address" value="{{ delivery.address }}" placeholder="Enter delivery address"
+                    required>
+
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <div style="margin-top: 15px;">
+                        <button type="submit" class="generate-btn">Save</button>
+                        <button class="clear-btn"><a href="{% url 'dashboard' %}">Cancel</a></button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 </body>
 
 </html>
