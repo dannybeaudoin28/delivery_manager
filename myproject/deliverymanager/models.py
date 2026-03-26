@@ -23,6 +23,7 @@ class Delivery(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_custom = models.BooleanField(default=False)
     
     route = models.ForeignKey(
         Route, 

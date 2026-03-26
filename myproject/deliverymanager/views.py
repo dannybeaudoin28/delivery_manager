@@ -15,6 +15,8 @@ from deliverymanager.models import Driver
 
 from deliverymanager.factories.delivery_factory import DeliveryFactory
 
+from django.utils import timezone
+
 
 delivery_repository = DeliveryRepository()
 geocoding_service = GeocodingService()
@@ -75,14 +77,37 @@ def delivery_list_view(request):
         "deliveries": deliveries
     })
 
+from datetime import datetime
+
 def add_delivery_view(request):
     if request.method == "POST":
         address = request.POST.get("address")
-        delivery_type = request.POST.get("delivery_type")
-        params = (address, delivery_type)
+        delivery_type = request.POST.get("delivery_type", "normal")
 
-        command = AddDeliveryCommand(geocoding_service, delivery_repository, delivery_factory)
-        command.execute(params)
+        command = AddDeliveryCommand(
+            geocoding_service,
+            delivery_repository,
+            delivery_factory
+        )
+
+        kwargs = {
+            "address": address,
+            "delivery_type": delivery_type,
+        }
+
+        if delivery_type == "custom":
+            priority_level = request.POST.get("priority_level")
+            scheduled_time = request.POST.get("scheduled_time")
+
+            if priority_level:
+                kwargs["priority_level"] = int(priority_level)
+
+            if scheduled_time:
+                naive_dt = datetime.fromisoformat(scheduled_time)
+                aware_dt = timezone.make_aware(naive_dt, timezone.get_current_timezone())
+                kwargs["scheduled_time"] = aware_dt
+
+        command.execute(**kwargs)
 
     return redirect("dashboard")
 

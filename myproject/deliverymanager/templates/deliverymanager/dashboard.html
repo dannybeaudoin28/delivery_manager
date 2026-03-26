@@ -259,6 +259,42 @@
         .edit-btn:hover {
             background-color: #0056b3;
         }
+
+        input[type="datetime-local"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .priority-1 {
+            border-left: 5px solid red;
+        }
+
+        .priority-2 {
+            border-left: 5px solid orange;
+        }
+
+        .priority-3 {
+            border-left: 5px solid green;
+        }
+
+        .custom-delivery {
+            background-color: #fff8e1;
+            border-left: 5px solid #ffc107;
+        }
+
+        .custom-badge {
+            background-color: #ffc107;
+            color: black;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
     </style>
 </head>
 
@@ -275,12 +311,25 @@
                 <form method="post" action="{% url 'add_delivery' %}">
                     {% csrf_token %}
 
-                    <input type="text" name="address" required>
+                    <input type="text" name="address" placeholder="Enter delivery address" required>
 
                     <label>
-                        <input type="checkbox" name="delivery_type" value="custom">
+                        <input type="checkbox" id="customDeliveryCheckbox" name="delivery_type" value="custom">
                         Custom Delivery
                     </label>
+
+                    <div id="customDeliveryFields" style="display: none; margin-top: 15px;">
+                        <label for="priority">Priority</label>
+                        <select name="priority_level" id="priority" class="driver-select">
+                            <option value="">Select Priority</option>
+                            <option value="1">High</option>
+                            <option value="2">Medium</option>
+                            <option value="3">Low</option>
+                        </select>
+
+                        <label for="scheduled_time" style="display:block; margin-top: 12px;">Scheduled Time</label>
+                        <input type="datetime-local" name="scheduled_time" id="scheduled_time">
+                    </div>
 
                     <button type="submit">Add To Queue</button>
                 </form>
@@ -295,9 +344,13 @@
                 {% if deliveries %}
                 <ul>
                     {% for delivery in deliveries %}
-                    <li>
-                        <span>{{ delivery.address }}</span>
-
+                    <li class="{% if delivery.is_custom %}custom-delivery{% endif %}">
+                        <span>
+                            {{ delivery.address }}
+                            {% if delivery.is_custom %}
+                            <span class="custom-badge">Custom</span>
+                            {% endif %}
+                        </span>
                         <div class="delivery-actions">
                             <a href="{% url 'edit_delivery' delivery.id %}" class="edit-btn">Edit</a>
 
@@ -473,5 +526,16 @@
             </div>
         </div>
 </body>
+<script>
+    const customCheckbox = document.getElementById("customDeliveryCheckbox");
+    const customFields = document.getElementById("customDeliveryFields");
+
+    function toggleCustomFields() {
+        customFields.style.display = customCheckbox.checked ? "block" : "none";
+    }
+
+    customCheckbox.addEventListener("change", toggleCustomFields);
+    toggleCustomFields();
+</script>
 
 </html>

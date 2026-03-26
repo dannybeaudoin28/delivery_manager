@@ -104,7 +104,17 @@ class RoutingService:
             if not candidates:
                 break
 
-            best_distance, best_index, best_duration = min(candidates, key=lambda t: t[0])
+            highest_priority = min(
+                self.get_delivery_priority(remaining_stops[candidate[1]])
+                for candidate in candidates
+            )
+
+            priority_candidates = [
+                candidate for candidate in candidates
+                if self.get_delivery_priority(remaining_stops[candidate[1]]) == highest_priority
+            ]
+
+            best_distance, best_index, best_duration = min(priority_candidates, key=lambda t: t[0])
 
             next_stop = remaining_stops[best_index]
 
@@ -137,3 +147,6 @@ class RoutingService:
             "total_distance_meters": total_distance,
             "total_duration_seconds": total_duration_seconds
         }
+        
+    def get_delivery_priority(self, delivery):
+        return getattr(delivery, "priority_level", 3)
