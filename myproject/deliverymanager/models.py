@@ -6,7 +6,7 @@ class Route(models.Model):
     
 class Driver(models.Model):
     name = models.CharField(max_length=30)
-    route = models.OneToOneField(Route, on_delete=models.SET_NULL, null=True)
+    route = models.OneToOneField(Route, on_delete=models.SET_NULL, null=True, related_name="driver")
     
 class Delivery(models.Model):
     STATUS_UNASSIGNED = "Unassigned"

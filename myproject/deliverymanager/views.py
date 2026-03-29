@@ -5,6 +5,8 @@ from django.http import HttpResponse
 from deliverymanager.commands.add_delivery_command import AddDeliveryCommand
 from deliverymanager.commands.generate_route_command import GenerateRouteCommand
 from deliverymanager.commands.mark_delivery_delivered_command import MarkDeliveryDeliveredCommand
+from deliverymanager.commands.remove_delivery_command import RemoveDeliveryCommand
+from deliverymanager.commands.update_delivery_command import UpdateDeliveryCommand
 
 from deliverymanager.repositories.delivery_repository import DeliveryRepository
 from deliverymanager.services.geocoding_service import GeocodingService
@@ -16,7 +18,6 @@ from deliverymanager.models import Driver
 from deliverymanager.factories.delivery_factory import DeliveryFactory
 
 from django.utils import timezone
-
 
 delivery_repository = DeliveryRepository()
 geocoding_service = GeocodingService()
@@ -150,10 +151,13 @@ def add_delivery_view(request):
     return redirect("dashboard")
 
 def remove_delivery_view(request, delivery_id):
+    """
+    Handle deletion of a delivery via POST request.
+    Delegates deletion behavior to the RemoveDeliveryCommand.
+    """
     if request.method == "POST":
-        delivery = get_object_or_404(Delivery, id=delivery_id)
-        delivery_repository = DeliveryRepository()
-        delivery_repository.remove_delivery(delivery)
+        command = RemoveDeliveryCommand(delivery_repository)
+        command.execute(delivery_id)
 
     return redirect("dashboard")
 
@@ -190,11 +194,31 @@ def mark_delivered(request, delivery_id):
     return redirect("dashboard")
 
 def edit_delivery(request, delivery_id):
+    """
+    Handle delivery edits.
+
+    GET:
+        Render the edit form.
+
+    POST:
+        Update the delivery using the UpdateDeliveryCommand and redirect
+        back to the dashboard.
+    """
     delivery = get_object_or_404(Delivery, id=delivery_id)
 
     if request.method == "POST":
-        delivery.address = request.POST.get("address", "").strip()
-        delivery.save()
-        return redirect('dashboard')  
+        address = request.POST.get("address", "").strip()
 
-    return render(request, 'deliverymanager/edit_delivery.html', {'delivery': delivery})
+        command = UpdateDeliveryCommand(
+            delivery_repository,
+            geocoding_service,
+        )
+        command.execute(delivery_id, address=address)
+
+        return redirect("dashboard")
+
+    return render(
+        request,
+        "deliverymanager/edit_delivery.html",
+        {"delivery": delivery},
+    )
