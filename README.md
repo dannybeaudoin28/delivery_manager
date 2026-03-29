@@ -111,7 +111,7 @@ Create a `.env` file in the project root:
 
 ```
 ROUTES_API_KEY=your_google_routes_api_key
-ROUTES_GROUP_API_URL=https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix
+ROUTES_GROUP_API_URL=provided_url
 ```
 
 Quick Setup  
