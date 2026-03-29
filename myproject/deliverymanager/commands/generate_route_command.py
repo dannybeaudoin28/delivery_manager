@@ -114,7 +114,7 @@ class GenerateRouteCommand(DeliveryCommand):
         Assign the newly created route to the specified driver.
         """
         driver.route = route
-        driver.save()
+        self.driver_repository.assign_route(driver)
 
     def _assign_deliveries_to_route(self, route, ordered_route_data):
         """

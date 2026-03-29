@@ -188,7 +188,7 @@ def generate_route_view(request):
 def mark_delivered(request, delivery_id):
     print("ID IS: " + str(delivery_id))
     if request.method == "POST":
-        command = MarkDeliveryDeliveredCommand(delivery_repository)
+        command = MarkDeliveryDeliveredCommand(delivery_repository, routing_repository)
         command.execute(delivery_id)
 
     return redirect("dashboard")

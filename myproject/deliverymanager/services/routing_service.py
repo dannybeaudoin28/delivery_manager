@@ -4,8 +4,8 @@ import requests
 
 class RoutingService:
     def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv("routes-api-key")
-        self.routes_group_api_url = os.getenv("routes-group-api-url")
+        self.api_key = api_key or os.getenv("ROUTES_API_KEY")
+        self.routes_group_api_url = os.getenv("ROUTES_GROUP_API_URL")
         
         print(self.routes_group_api_url)
 

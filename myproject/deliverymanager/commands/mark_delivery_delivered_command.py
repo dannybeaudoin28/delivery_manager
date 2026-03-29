@@ -9,8 +9,9 @@ class MarkDeliveryDeliveredCommand(DeliveryCommand):
 
     # Constructor initializes required dependency:
     # - delivery_repository: handles retrieval and persistence of delivery data
-    def __init__(self, delivery_repository):
+    def __init__(self, delivery_repository, route_repository):
         self.delivery_repository = delivery_repository
+        self.route_repository = route_repository
 
     # Executes the process of marking a delivery as delivered
     def execute(self, id):
@@ -31,7 +32,8 @@ class MarkDeliveryDeliveredCommand(DeliveryCommand):
         if route is not None:
 
             # Count remaining deliveries that are still assigned (not delivered)
-            remaining = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
+            # remaining = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
+            remaining = self.route_repository.count_remaining_deliveries(route, Delivery)
 
             # If no deliveries remain, unassign the driver from the route
             if remaining == 0:

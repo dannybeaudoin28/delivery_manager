@@ -13,3 +13,6 @@ class RouteRepository:
 
     def get_all_routes_ordered_by_route_order(self, route):
         return route.deliveries.all().order_by('route_order')
+    
+    def count_remaining_deliveries(self, route, Delivery):
+        return route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
