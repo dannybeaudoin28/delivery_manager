@@ -6,7 +6,8 @@ A Django-based web application for managing delivery queues and generating optim
 
 This project simulates a delivery management system for small businesses (such as pizzerias) where dispatchers can create deliveries, assign them to drivers, and generate efficient routes.
 
-The system integrates with the Google Routes API to calculate distances and travel times, allowing routes to be built dynamically based on real-world data.
+The system models real-world delivery workflows including queue management, driver assignment, and route optimization and integrates with the Google Routes API to calculate distances and travel times, allowing routes to be built dynamically based on real-world data.
+
 This allows route optimization based on real-world distance and travel time data.
 
 ## Screenshots
@@ -23,6 +24,9 @@ This allows route optimization based on real-world distance and travel time data
 ### Route Generation
 ![Route Generation](myproject/documentation/images/route_generation.png)
 
+### Route Optimization Flow - Sequence Diagram
+![Sequence Diagram](myproject/documentation/images/4sa3_proj_sequence.jpg)
+
 ## Features
 
 ### Delivery Management
@@ -35,7 +39,7 @@ This allows route optimization based on real-world distance and travel time data
 
 ### Route Generation
 
-* Generates routes using a greedy nearest-neighbor approach
+* Generates delivery routes using a greedy nearest-neighbor algorithm
 * Calculates:
 
   * Distance between stops
