@@ -122,6 +122,10 @@ Quick Setup
 
 3. Run: .\start.ps1
 
+4. Optional: If you have already stopped and run the program and would like to restart it, 
+             and just need to run the proxy you can run .\quick_start.ps1 from the project 
+             directory and that will start the proxy.
+
   
 
 ## Setup
