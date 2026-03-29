@@ -74,26 +74,33 @@ The system integrates with the **Google Routes API** to dynamically calculate ef
 ## Project Structure
 
 ```
-myproject/
-│
-├── deliverymanager/
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   ├── commands/
-│   ├── repositories/
-│   ├── services/
-│   └── templates/
-│
+## 📂 Project Structure
+
+```text
+delivery_manager/
 ├── myproject/
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
-├── proxy/              # (ignored in Git)
-├── venv/               # (ignored in Git)
-├── requirements.txt
-└── manage.py
+│   ├── deliverymanager/
+│   │   ├── commands/
+│   │   ├── factories/
+│   │   ├── migrations/
+│   │   ├── repositories/
+│   │   ├── services/
+│   │   ├── static/
+│   │   ├── templates/
+│   │   ├── templatetags/
+│   │   ├── admin.py
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── myproject/
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── asgi.py
+│   │   └── wsgi.py
+│   ├── manage.py
+│   ├── requirements.txt
+│   └── start.ps1
+└── README.md
 ```
 
 ---
