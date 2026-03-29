@@ -97,10 +97,6 @@ class GenerateRouteCommand(DeliveryCommand):
             eligible_deliveries
         )
 
-        print("ORDERED ROUTE DATA:")
-        for stop in ordered_route_data:
-            print(stop)
-
         return ordered_route_data
 
     def _create_route(self, totals):
@@ -114,7 +110,7 @@ class GenerateRouteCommand(DeliveryCommand):
         Assign the newly created route to the specified driver.
         """
         driver.route = route
-        self.driver_repository.assign_route(driver)
+        self.driver_repository.save_driver(driver)
 
     def _assign_deliveries_to_route(self, route, ordered_route_data):
         """

@@ -12,7 +12,6 @@ from deliverymanager.repositories.delivery_repository import DeliveryRepository
 from deliverymanager.repositories.driver_repository import DriverRepository
 from deliverymanager.repositories.route_repository import RouteRepository
 
-
 from deliverymanager.services.geocoding_service import GeocodingService
 from deliverymanager.services.routing_service import RoutingService
 
@@ -23,6 +22,7 @@ from deliverymanager.factories.delivery_factory import DeliveryFactory
 
 from django.utils import timezone
 
+# Instantiate repositories, services, and factory once for reuse across views
 delivery_repository = DeliveryRepository()
 driver_repository = DriverRepository()
 routing_repository = RouteRepository()
@@ -32,23 +32,40 @@ routing_service = RoutingService()
 
 delivery_factory = DeliveryFactory()
 
+
 def dashboard_view(request):
+    """
+    Main dashboard view.
+
+    Displays:
+    - Unassigned deliveries
+    - All deliveries
+    - Available drivers
+    - Latest generated route and its breakdown
+
+    Also ensures drivers are unassigned from routes that no longer
+    have active deliveries.
+    """
     remaining_time = 0 
     distance = 0
     deliveries = delivery_repository.get_unassigned_deliveries()
     all_deliveries = delivery_repository.get_all_deliveries()
+    null_routes = driver_repository.exclude_null_routes()
     
-    for driver in Driver.objects.exclude(route__isnull=True):
+    # Clean up drivers whose routes no longer have active deliveries
+    for driver in null_routes:
         route = driver.route
         if route is None:
             continue
 
-        active_deliveries = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count() # type: ignore
+        # Count active deliveries for this driver's route
+        active_deliveries = delivery_repository.get_active_deliveries(route)  # type: ignore
 
         if active_deliveries == 0:
             driver.route = None
             driver.save()
 
+    # Retrieve available drivers and most recent route
     drivers = driver_repository.get_available_driver_ordered_by_name()    
     latest_route = routing_repository.get_latest_route_ordered_by_id_des()
     latest_route_deliveries = []
@@ -57,6 +74,7 @@ def dashboard_view(request):
     if latest_route:
         latest_route_deliveries = routing_repository.get_all_routes_ordered_by_route_order(latest_route)
 
+        # Compute display-friendly time and distance values
         minutes, seconds = divmod(latest_route.total_time, 60)
         kilometers, meters = divmod(latest_route.total_distance, 1000)
 
@@ -73,6 +91,7 @@ def dashboard_view(request):
         total_delivery_distance = 0
         total_delivery_duration = 0
 
+        # Build a list of route stops including per-leg distance/duration
         for delivery in latest_route_deliveries:
             leg_distance = delivery.leg_distance_meters or 0
             leg_duration = delivery.leg_duration_seconds or 0
@@ -87,6 +106,7 @@ def dashboard_view(request):
                 "duration_seconds": leg_duration,
             })
 
+        # Add return-to-origin leg if applicable
         return_distance = latest_route.total_distance - total_delivery_distance
         return_duration = latest_route.total_time - total_delivery_duration
 
@@ -109,16 +129,30 @@ def dashboard_view(request):
         "latest_route_stops": latest_route_stops,
     })
 
+
 def delivery_list_view(request):
+    """
+    View showing only unassigned deliveries.
+    """
     deliveries = delivery_repository.get_unassigned_deliveries()
     
     return render(request, "deliverymanager/delivery_list.html", {
         "deliveries": deliveries
     })
 
+
 from datetime import datetime
 
 def add_delivery_view(request):
+    """
+    Handles creation of a new delivery.
+
+    Supports both:
+    - Normal deliveries
+    - Custom deliveries (priority + scheduled time)
+
+    Delegates creation logic to AddDeliveryCommand.
+    """
     if request.method == "POST":
         address = request.POST.get("address")
         delivery_type = request.POST.get("delivery_type", "normal")
@@ -129,11 +163,13 @@ def add_delivery_view(request):
             delivery_factory
         )
 
+        # Prepare arguments for command execution
         kwargs = {
             "address": address,
             "delivery_type": delivery_type,
         }
 
+        # Handle additional fields for custom deliveries
         if delivery_type == "custom":
             priority_level = request.POST.get("priority_level")
             scheduled_time = request.POST.get("scheduled_time")
@@ -150,6 +186,7 @@ def add_delivery_view(request):
 
     return redirect("dashboard")
 
+
 def remove_delivery_view(request, delivery_id):
     """
     Handle deletion of a delivery via POST request.
@@ -161,12 +198,22 @@ def remove_delivery_view(request, delivery_id):
 
     return redirect("dashboard")
 
+
 def clear_queue_view(request):
+    """
+    Clears all unassigned deliveries from the queue.
+    """
     if request.method == "POST":
         delivery_repository.clear_queue()
     return redirect('dashboard')
 
+
 def generate_route_view(request):
+    """
+    Generates an optimized delivery route for a selected driver.
+
+    Delegates route computation and assignment to GenerateRouteCommand.
+    """
     if request.method == "POST":
         try:
             driver_id = request.POST.get("driver_id")
@@ -185,13 +232,23 @@ def generate_route_view(request):
 
     return redirect("dashboard")
 
+
 def mark_delivered(request, delivery_id):
-    print("ID IS: " + str(delivery_id))
+    """
+    Marks a delivery as delivered and updates route/driver state
+    accordingly via MarkDeliveryDeliveredCommand.
+    """
     if request.method == "POST":
-        command = MarkDeliveryDeliveredCommand(delivery_repository, routing_repository)
+        command = MarkDeliveryDeliveredCommand(
+                driver_repository,
+                delivery_repository,
+                routing_repository
+            )
+        
         command.execute(delivery_id)
 
     return redirect("dashboard")
+
 
 def edit_delivery(request, delivery_id):
     """

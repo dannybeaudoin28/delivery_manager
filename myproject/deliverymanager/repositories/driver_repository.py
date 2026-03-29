@@ -9,7 +9,7 @@ class DriverRepository:
     and centralizes driver-related persistence and retrieval logic.
     """
 
-    def assign_route(self, driver):
+    def save_driver(self, driver):
         """
         Persist changes to a driver, typically after assigning or updating a route.
 
@@ -61,3 +61,6 @@ class DriverRepository:
             Driver | None: The driver assigned to the route, if one exists.
         """
         return Driver.objects.filter(route=route).first()
+    
+    def exclude_null_routes(self):
+        return Driver.objects.exclude(route__isnull=True)

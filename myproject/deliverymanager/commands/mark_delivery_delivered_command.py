@@ -1,5 +1,4 @@
-from deliverymanager.models import Delivery, Driver
-from deliverymanager.repositories.delivery_repository import Delivery
+from deliverymanager.models import Driver
 
 from deliverymanager.commands.delivery_command import DeliveryCommand
 
@@ -9,7 +8,8 @@ class MarkDeliveryDeliveredCommand(DeliveryCommand):
 
     # Constructor initializes required dependency:
     # - delivery_repository: handles retrieval and persistence of delivery data
-    def __init__(self, delivery_repository, route_repository):
+    def __init__(self, driver_repository, delivery_repository, route_repository):
+        self.driver_repository = driver_repository
         self.delivery_repository = delivery_repository
         self.route_repository = route_repository
 
@@ -35,12 +35,12 @@ class MarkDeliveryDeliveredCommand(DeliveryCommand):
             if remaining == 0:
 
                 # Find the driver assigned to this route
-                driver = Driver.objects.filter(route=route).first()
+                driver = self.driver_repository.get_driver_by_route(route)
 
                 # If a driver is found, remove the route assignment
                 if driver:
                     driver.route = None
-                    driver.save()
+                    self.driver_repository.save_driver(driver)
 
         # Return the updated delivery object
         return delivery

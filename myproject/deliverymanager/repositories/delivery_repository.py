@@ -108,3 +108,5 @@ class DeliveryRepository:
         return delivery
     
     
+    def get_active_deliveries(self, route):
+        return route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
