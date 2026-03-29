@@ -19,28 +19,28 @@ The system integrates with the **Google Routes API** to dynamically calculate ef
 
 ### Delivery Management
 
-* Add new deliveries with address → auto-geocoded to coordinates
-* View all deliveries (assigned and unassigned)
-* Delete individual or all unassigned deliveries
-* Mark deliveries as **Delivered**
-* Automatically frees driver when route is completed
+ Add new deliveries with address → auto-geocoded to coordinates
+ View all deliveries (assigned and unassigned)
+ Delete individual or all unassigned deliveries
+ Mark deliveries as **Delivered**
+ Automatically frees driver when route is completed
 
 ### Route Generation
 
-* Generate optimized routes using a greedy nearest-neighbor approach
-* Calculates:
+ Generate optimized routes using a greedy nearest-neighbor approach
+ Calculates:
 
-  * Distance between stops
-  * Time between stops
-  * Total route distance and duration
-* Assigns route to selected driver
-* Prevents assigning routes to drivers already in use
+   Distance between stops
+   Time between stops
+   Total route distance and duration
+ Assigns route to selected driver
+ Prevents assigning routes to drivers already in use
 
 ### Driver Management
 
-* Drivers created via Django Admin
-* Dropdown selection in UI
-* One-to-one relationship with routes
+ Drivers created via Django Admin
+ Dropdown selection in UI
+ One-to-one relationship with routes
 
 ### Architecture
 
