@@ -49,13 +49,13 @@ def dashboard_view(request):
             driver.route = None
             driver.save()
 
-    drivers = Driver.objects.filter(route__isnull=True).order_by("name")    
-    latest_route = Route.objects.order_by('-id').first()
+    drivers = driver_repository.get_available_driver_ordered_by_name()    
+    latest_route = routing_repository.get_latest_route_ordered_by_id_des()
     latest_route_deliveries = []
     latest_route_stops = []
 
     if latest_route:
-        latest_route_deliveries = latest_route.deliveries.all().order_by('route_order')
+        latest_route_deliveries = routing_repository.get_all_routes_ordered_by_route_order(latest_route)
 
         minutes, seconds = divmod(latest_route.total_time, 60)
         kilometers, meters = divmod(latest_route.total_distance, 1000)
@@ -97,14 +97,6 @@ def dashboard_view(request):
                 "distance_meters": return_distance,
                 "duration_seconds": return_duration,
             })
-            
-        print("ROUTE TOTAL DISTANCE:", latest_route.total_distance)
-        print("SUM DELIVERY DISTANCE:", total_delivery_distance)
-        print("RETURN DISTANCE:", return_distance)
-
-        print("ROUTE TOTAL TIME:", latest_route.total_time)
-        print("SUM DELIVERY TIME:", total_delivery_duration)
-        print("RETURN TIME:", return_duration)
 
     return render(request, "deliverymanager/dashboard.html", {
         "deliveries": deliveries,

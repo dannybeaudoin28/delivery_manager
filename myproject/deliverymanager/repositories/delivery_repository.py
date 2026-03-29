@@ -106,3 +106,5 @@ class DeliveryRepository:
         delivery.leg_duration_seconds = None
         delivery.save()
         return delivery
+    
+    
