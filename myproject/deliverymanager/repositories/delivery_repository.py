@@ -109,4 +109,13 @@ class DeliveryRepository:
     
     
     def get_active_deliveries(self, route):
+        """
+        Return a list of active delivery objects.
+
+        Args:
+            route (Route): Route to see which deliveries are active.
+
+        Returns:
+            Delivery: List of delivery objects whose status is STATUS_ASSIGNED.
+        """
         return route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()

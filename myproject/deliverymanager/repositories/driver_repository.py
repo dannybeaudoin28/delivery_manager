@@ -50,10 +50,6 @@ class DriverRepository:
         """
         Retrieve the driver assigned to a specific route.
 
-        Note:
-            Despite the method name, this returns a single driver (or None),
-            not a collection.
-
         Args:
             route (Route): The route to find the assigned driver for.
 
@@ -62,5 +58,11 @@ class DriverRepository:
         """
         return Driver.objects.filter(route=route).first()
     
+    
     def exclude_null_routes(self):
+        """
+        Retrieve the drivers who have routes.
+        Returns:
+            Driver | None: A list of drivers who have routes assigned.
+        """
         return Driver.objects.exclude(route__isnull=True)
