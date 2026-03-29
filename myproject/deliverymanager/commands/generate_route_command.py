@@ -13,9 +13,17 @@ class GenerateRouteCommand(DeliveryCommand):
     to a driver based on currently eligible deliveries.
     """
 
-    def __init__(self, delivery_repository, routing_service):
-        self.delivery_repository = delivery_repository
-        self.routing_service = routing_service
+    def __init__(
+            self, 
+            delivery_repository, 
+            driver_repository, 
+            routing_repository, 
+            routing_service
+        ):
+            self.delivery_repository = delivery_repository
+            self.driver_repository = driver_repository
+            self.routing_repository = routing_repository
+            self.routing_service = routing_service
 
     def execute(self, origin, driver_id):
         """
@@ -73,7 +81,7 @@ class GenerateRouteCommand(DeliveryCommand):
         """
         Retrieve a driver and ensure they do not already have an assigned route.
         """
-        driver = Driver.objects.get(id=driver_id)
+        driver = self.driver_repository.get_driver_by_id(driver_id=driver_id)
 
         if driver.route is not None:
             raise ValueError(f"Driver '{driver.name}' already has an assigned route.")
@@ -99,10 +107,7 @@ class GenerateRouteCommand(DeliveryCommand):
         """
         Create and persist a new Route record using calculated totals.
         """
-        return Route.objects.create(
-            total_time=totals["total_duration_seconds"],
-            total_distance=totals["total_distance_meters"],
-        )
+        return self.routing_repository.create_route(totals)
 
     def _assign_route_to_driver(self, driver, route):
         """
@@ -129,7 +134,8 @@ class GenerateRouteCommand(DeliveryCommand):
             delivery.leg_duration_seconds = self._parse_duration_to_seconds(
                 stop.get("duration")
             )
-            delivery.save()
+            
+            self.delivery_repository.add_or_update_delivery(delivery)
 
             route_order += 1
 

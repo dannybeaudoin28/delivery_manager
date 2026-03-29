@@ -9,6 +9,10 @@ from deliverymanager.commands.remove_delivery_command import RemoveDeliveryComma
 from deliverymanager.commands.update_delivery_command import UpdateDeliveryCommand
 
 from deliverymanager.repositories.delivery_repository import DeliveryRepository
+from deliverymanager.repositories.driver_repository import DriverRepository
+from deliverymanager.repositories.route_repository import RouteRepository
+
+
 from deliverymanager.services.geocoding_service import GeocodingService
 from deliverymanager.services.routing_service import RoutingService
 
@@ -20,8 +24,12 @@ from deliverymanager.factories.delivery_factory import DeliveryFactory
 from django.utils import timezone
 
 delivery_repository = DeliveryRepository()
+driver_repository = DriverRepository()
+routing_repository = RouteRepository()
+
 geocoding_service = GeocodingService()
 routing_service = RoutingService()
+
 delivery_factory = DeliveryFactory()
 
 def dashboard_view(request):
@@ -35,7 +43,7 @@ def dashboard_view(request):
         if route is None:
             continue
 
-        active_deliveries = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
+        active_deliveries = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count() # type: ignore
 
         if active_deliveries == 0:
             driver.route = None
@@ -175,7 +183,7 @@ def generate_route_view(request):
                 return HttpResponse("Please select a driver.", status=400)
 
             routing_service = RoutingService()
-            command = GenerateRouteCommand(delivery_repository, routing_service)
+            command = GenerateRouteCommand(delivery_repository, driver_repository, routing_repository, routing_service)
 
             origin = (44.2312, -76.4860)
             command.execute(origin, driver_id)
