@@ -63,7 +63,7 @@ def dashboard_view(request):
 
         if active_deliveries == 0:
             driver.route = None
-            driver.save()
+            driver_repository.save_driver(driver)
 
     # Retrieve available drivers and most recent route
     drivers = driver_repository.get_available_driver_ordered_by_name()    
@@ -221,7 +221,6 @@ def generate_route_view(request):
             if not driver_id:
                 return HttpResponse("Please select a driver.", status=400)
 
-            routing_service = RoutingService()
             command = GenerateRouteCommand(delivery_repository, driver_repository, routing_repository, routing_service)
 
             origin = (44.2312, -76.4860)
@@ -261,7 +260,7 @@ def edit_delivery(request, delivery_id):
         Update the delivery using the UpdateDeliveryCommand and redirect
         back to the dashboard.
     """
-    delivery = get_object_or_404(Delivery, id=delivery_id)
+    delivery = delivery_repository.get_delivery_by_id(delivery_id)
 
     if request.method == "POST":
         address = request.POST.get("address", "").strip()

@@ -1,5 +1,3 @@
-from deliverymanager.models import Driver
-
 from deliverymanager.commands.delivery_command import DeliveryCommand
 
 
@@ -28,7 +26,6 @@ class MarkDeliveryDeliveredCommand(DeliveryCommand):
         if route is not None:
 
             # Count remaining deliveries that are still assigned (not delivered)
-            # remaining = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
             remaining = self.route_repository.count_remaining_deliveries(route)
 
             # If no deliveries remain, unassign the driver from the route
