@@ -7,6 +7,21 @@ A Django-based web application for managing delivery queues and generating optim
 This project simulates a delivery management system for small businesses (such as pizzerias) where dispatchers can create deliveries, assign them to drivers, and generate efficient routes.
 
 The system integrates with the Google Routes API to calculate distances and travel times, allowing routes to be built dynamically based on real-world data.
+This allows route optimization based on real-world distance and travel time data.
+
+## Screenshots
+
+### Add Delivery
+![Add Delivery](myproject/documentation/images/add_to_queue.png)
+
+### Delivery Queue
+![Delivery Queue](myproject/documentation/images/delivery_queue.png)
+
+### All Deliveries
+![All Deliveries](myproject/documentation/images/all_deliveries.png)
+
+### Route Generation
+![Route Generation](myproject/documentation/images/route_generation.png)
 
 ## Features
 
@@ -95,13 +110,11 @@ ROUTES_API_KEY=your_google_routes_api_key
 ROUTES_GROUP_API_URL=https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix
 ```
 
- 
-
 Quick Setup  
 
-1. Navigate to project route directory
+1. Navigate to the project directory
 
-2. Open terminal
+2. Open a terminal
 
 3. Run: .\start.ps1
 
