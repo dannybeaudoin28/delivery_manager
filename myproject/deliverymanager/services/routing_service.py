@@ -7,8 +7,6 @@ class RoutingService:
         self.api_key = api_key or os.getenv("ROUTES_API_KEY")
         self.routes_group_api_url = os.getenv("ROUTES_GROUP_API_URL")
         
-        print(self.routes_group_api_url)
-
         self.headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": self.api_key,
@@ -140,15 +138,9 @@ class RoutingService:
 
                 return_matrix = self.get_multiple_routes(last_location, [home_stop])
 
-                print("LAST LOCATION:", last_location)
-                print("HOME:", (home_stop.latitude, home_stop.longitude))
-                print("RETURN MATRIX:", return_matrix)
-
                 for elem in return_matrix:
                     if not isinstance(elem, dict):
                         continue
-
-                    print("RETURN ELEM:", elem)
 
                     if elem.get("condition") != "ROUTE_EXISTS":
                         continue
@@ -168,7 +160,6 @@ class RoutingService:
                             "is_return": True
                         })
 
-                        print("RETURN STOP APPENDED")
                         break
                     except (ValueError, TypeError):
                         continue

@@ -1,5 +1,5 @@
 from deliverymanager.models import Delivery, Driver
-from deliverymanager.repositories.delivery_repository import DeliveryRepository
+from deliverymanager.repositories.delivery_repository import Delivery
 
 from deliverymanager.commands.delivery_command import DeliveryCommand
 
@@ -15,10 +15,6 @@ class MarkDeliveryDeliveredCommand(DeliveryCommand):
 
     # Executes the process of marking a delivery as delivered
     def execute(self, id):
-
-        # Debug output to trace which delivery ID is being processed
-        print("Inside command id is: " + str(id))
-
         # Retrieve the delivery object by ID
         delivery = self.delivery_repository.get_delivery_by_id(id)
 
@@ -33,7 +29,7 @@ class MarkDeliveryDeliveredCommand(DeliveryCommand):
 
             # Count remaining deliveries that are still assigned (not delivered)
             # remaining = route.deliveries.filter(status=Delivery.STATUS_ASSIGNED).count()
-            remaining = self.route_repository.count_remaining_deliveries(route, Delivery)
+            remaining = self.route_repository.count_remaining_deliveries(route)
 
             # If no deliveries remain, unassign the driver from the route
             if remaining == 0:
