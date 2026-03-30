@@ -18,7 +18,7 @@ class GeocodingService:
             api_key (str, optional): API key for the geocoding service.
                                      Falls back to environment variable if not provided.
         """
-        self.api_key = api_key or os.getenv("ROUTES_API_KEY")
+        self._api_key = api_key or os.getenv("ROUTES_API_KEY")
 
     def get_coordinates(self, address):
         """
@@ -34,7 +34,7 @@ class GeocodingService:
             ValueError: If the address cannot be geocoded.
         """
         # Call external geocoding API
-        geo = geocoder.google(address, key=self.api_key)
+        geo = geocoder.google(address, key=self._api_key)
 
         # Validate response
         if not geo.ok or not geo.latlng:

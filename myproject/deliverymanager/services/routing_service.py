@@ -8,17 +8,17 @@ class RoutingService:
     and computing optimized delivery routes.
     """
 
-    def __init__(self, api_key=None):
+    def __init__(self, _api_key=None):
         """
         Initialize routing service with API credentials and headers.
         """
-        self.api_key = api_key or os.getenv("ROUTES_API_KEY")
-        self.routes_group_api_url = os.getenv("ROUTES_GROUP_API_URL")
+        self._api_key = _api_key or os.getenv("ROUTES_API_KEY")
+        self._routes_group_api_url = os.getenv("ROUTES_GROUP_API_URL")
         
         # Predefine headers for all API requests
         self.headers = {
             "Content-Type": "application/json",
-            "X-Goog-Api-Key": self.api_key,
+            "X-Goog-Api-Key": self._api_key,
             "X-Goog-FieldMask": "originIndex,destinationIndex,distanceMeters,duration,status,condition"
         }
 
@@ -29,10 +29,10 @@ class RoutingService:
         from a single origin to multiple delivery destinations.
         """
         # Validate required configuration
-        if not self.routes_group_api_url:
+        if not self._routes_group_api_url:
             raise ValueError("ROUTES_GROUP_API_URL is not set.")
 
-        if not self.api_key:
+        if not self._api_key:
             raise ValueError("ROUTES_API_KEY is not set.")
 
         # Build request body
@@ -68,7 +68,7 @@ class RoutingService:
 
         # Send request to routing API
         response = requests.post(
-            url=self.routes_group_api_url,
+            url=self._routes_group_api_url,
             headers=self.headers,
             json=body,
             timeout=15
