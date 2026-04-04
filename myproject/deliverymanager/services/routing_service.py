@@ -208,7 +208,7 @@ class RoutingService:
             total_distance += stop.get("distance_meters", 0)
 
             duration = stop.get("duration")
-            # Convert duration string (e.g., "120s") to integer seconds
+            # Convert duration string to integer seconds
             if isinstance(duration, str) and duration.endswith("s"):
                 try:
                     total_duration_seconds += int(duration[:-1])
