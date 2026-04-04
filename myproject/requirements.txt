@@ -1,5 +1,5 @@
 Django==5.0.3
-python-dotenv
+python-dotenv 1.2.2
 geocoder==1.38.1
 mysqlclient==2.2.8
 polyline==2.0.4
